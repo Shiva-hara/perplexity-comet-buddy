@@ -49,23 +49,10 @@ export function ChatAssistant({ onClose, currentUrl }: ChatAssistantProps) {
 
     try {
       const history = messages.map((m) => ({ role: m.role, content: m.content }));
-      // Add current page context if available
       const contextualQuery = currentUrl
         ? `[Browsing: ${currentUrl}] ${query}`
         : query;
 
-      const { data, error } = await supabase.functions.invoke("job-chat", {
-        body: {
-          messages: [
-            ...history,
-            { role: "user", content: contextualQuery },
-          ],
-        },
-      });
-
-      if (error) throw error;
-
-      // Handle streaming via ReadableStream
       const resp = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/job-chat`,
         {
