@@ -40,8 +40,8 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
 
   const toggleMic = useCallback(() => {
     if (isListening) { stopMic(); return; }
-    const SR = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
-      || (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) return;
 
     const rec = new SR();
@@ -53,7 +53,7 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
 
     rec.onresult = (e: SpeechRecognitionEvent) => {
       const transcript = Array.from(e.results)
-        .map((r) => r[0].transcript)
+        .map((r: SpeechRecognitionResult) => r[0].transcript)
         .join("");
       setInput(transcript);
     };
@@ -61,7 +61,6 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
     rec.onend = () => {
       setIsListening(false);
       recognitionRef.current = null;
-      // Auto-send if we got text
       setInput((prev) => {
         if (prev.trim()) setTimeout(() => sendMessage(prev), 100);
         return prev;
