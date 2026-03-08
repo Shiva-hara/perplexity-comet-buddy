@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X, Bot } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X, Bot, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AddressBarProps {
@@ -8,11 +8,13 @@ interface AddressBarProps {
   canGoBack: boolean;
   canGoForward: boolean;
   sidebarOpen: boolean;
+  trackerOpen: boolean;
   onNavigate: (url: string) => void;
   onBack: () => void;
   onForward: () => void;
   onRefresh: () => void;
   onToggleSidebar: () => void;
+  onToggleTracker: () => void;
 }
 
 export function AddressBar({
@@ -21,11 +23,13 @@ export function AddressBar({
   canGoBack,
   canGoForward,
   sidebarOpen,
+  trackerOpen,
   onNavigate,
   onBack,
   onForward,
   onRefresh,
   onToggleSidebar,
+  onToggleTracker,
 }: AddressBarProps) {
   const [inputValue, setInputValue] = useState(url);
   const [isFocused, setIsFocused] = useState(false);
@@ -71,9 +75,8 @@ export function AddressBar({
           isFocused ? "border-primary/50 shadow-[0_0_0_2px_hsl(var(--primary)/0.15)]" : "border-border"
         )}
       >
-        {/* Lock/globe icon */}
         <div className="shrink-0 text-muted-foreground">
-          {isEmpty ? ( // eslint-disable-line
+          {isEmpty ? (
             <Globe className="w-3 h-3" />
           ) : isSecure ? (
             <Lock className="w-3 h-3 text-primary/70" />
@@ -115,6 +118,21 @@ export function AddressBar({
           </button>
         )}
       </div>
+
+      {/* Job Tracker toggle */}
+      <button
+        onClick={onToggleTracker}
+        title="Job Pipeline Tracker"
+        className={cn(
+          "flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
+          trackerOpen
+            ? "bg-primary text-primary-foreground shadow-[0_0_10px_hsl(var(--primary)/0.4)]"
+            : "bg-surface border border-border text-muted-foreground hover:text-primary hover:border-primary/50"
+        )}
+      >
+        <Briefcase className="w-3.5 h-3.5" />
+        <span>Jobs</span>
+      </button>
 
       {/* Chat Assistant toggle */}
       <button

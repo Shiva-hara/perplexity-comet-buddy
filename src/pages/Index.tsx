@@ -4,6 +4,7 @@ import { TabBar } from "@/components/browser/TabBar";
 import { AddressBar } from "@/components/browser/AddressBar";
 import { WebFrame } from "@/components/browser/WebFrame";
 import { ChatAssistant } from "@/components/browser/ChatAssistant";
+import { JobTracker } from "@/components/browser/JobTracker";
 import { CommandPalette } from "@/components/browser/CommandPalette";
 import { normalizeUrl } from "@/hooks/useTabs";
 
@@ -25,6 +26,7 @@ const Index = () => {
   } = useTabs();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [trackerOpen, setTrackerOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
 
   // Keyboard shortcuts
@@ -37,6 +39,7 @@ const Index = () => {
       if (mod && e.key === "t") { e.preventDefault(); addTab(); }
       if (mod && e.key === "w") { e.preventDefault(); if (activeTab) closeTab(activeTab.id); }
       if (mod && e.shiftKey && e.key === "a") { e.preventDefault(); setSidebarOpen((v) => !v); }
+      if (mod && e.shiftKey && e.key === "j") { e.preventDefault(); setTrackerOpen((v) => !v); }
       if (e.key === "F5" || (mod && e.key === "r")) { e.preventDefault(); refresh(); }
     };
     window.addEventListener("keydown", handler);
@@ -47,6 +50,7 @@ const Index = () => {
     (url: string) => {
       const normalized = normalizeUrl(url);
       navigate(normalized);
+      setTrackerOpen(false);
     },
     [navigate]
   );
@@ -69,15 +73,17 @@ const Index = () => {
         canGoBack={canGoBack}
         canGoForward={canGoForward}
         sidebarOpen={sidebarOpen}
+        trackerOpen={trackerOpen}
         onNavigate={handleNavigate}
         onBack={goBack}
         onForward={goForward}
         onRefresh={refresh}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        onToggleTracker={() => setTrackerOpen((v) => !v)}
       />
 
       {/* Main content area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Web Frame */}
         <div className="flex flex-1 overflow-hidden">
           {activeTab && (
@@ -98,6 +104,17 @@ const Index = () => {
             onClose={() => setSidebarOpen(false)}
           />
         )}
+
+        {/* Job Tracker overlay */}
+        {trackerOpen && (
+          <JobTracker
+            onClose={() => setTrackerOpen(false)}
+            onOpenUrl={(url) => {
+              handleNavigate(url);
+              setTrackerOpen(false);
+            }}
+          />
+        )}
       </div>
 
       {/* Command Palette */}
@@ -105,7 +122,7 @@ const Index = () => {
         isOpen={commandOpen}
         onClose={() => setCommandOpen(false)}
         onNavigate={handleNavigate}
-        onAISearch={(query) => {
+        onAISearch={() => {
           setCommandOpen(false);
           setSidebarOpen(true);
         }}
