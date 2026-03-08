@@ -12,6 +12,7 @@ export interface ChatMessage {
 interface ChatAssistantProps {
   onClose: () => void;
   currentUrl?: string;
+  onNavigate?: (url: string) => void;
 }
 
 const QUICK_PROMPTS = [
@@ -21,7 +22,7 @@ const QUICK_PROMPTS = [
   "Find remote jobs for freshers",
 ];
 
-export function ChatAssistant({ onClose, currentUrl }: ChatAssistantProps) {
+export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistantProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +33,27 @@ export function ChatAssistant({ onClose, currentUrl }: ChatAssistantProps) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Extract URL from Step 1 navigation instruction
+  const extractNavUrl = (text: string): string | null => {
+    const step1Match = text.match(/[Ss]tep\s*1[^:]*[:：][^\n]*(?:navigate|open|go to)[^\n]*(https?:\/\/[^\s\n,)]+)/i);
+    if (step1Match) return step1Match[1].replace(/[.,)]+$/, "");
+    // Fallback: any https URL in the first line
+    const firstLine = text.split("\n")[0];
+    const urlMatch = firstLine.match(/https?:\/\/[^\s\n,)]+/);
+    return urlMatch ? urlMatch[0].replace(/[.,)]+$/, "") : null;
+  };
+
+  // Execute steps sequentially with delays like a human
+  const executeSteps = async (response: string) => {
+    if (!onNavigate) return;
+    const navUrl = extractNavUrl(response);
+    if (navUrl) {
+      // Simulate reading Step 1 then navigating (1.2s delay feels natural)
+      await new Promise((r) => setTimeout(r, 1200));
+      onNavigate(navUrl);
+    }
+  };
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -107,6 +129,9 @@ export function ChatAssistant({ onClose, currentUrl }: ChatAssistantProps) {
         ...newMessages.slice(0, -1),
         { role: "assistant", content: accumulated, isStreaming: false },
       ]);
+
+      // Execute browser actions after response is complete
+      executeSteps(accumulated);
     } catch (e: unknown) {
       if ((e as Error).name === "AbortError") return;
       setMessages([

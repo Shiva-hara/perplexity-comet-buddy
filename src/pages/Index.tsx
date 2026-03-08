@@ -101,6 +101,7 @@ const Index = () => {
         {sidebarOpen && (
           <ChatAssistant
             currentUrl={activeTab?.url}
+            onNavigate={handleNavigate}
             onClose={() => setSidebarOpen(false)}
           />
         )}
