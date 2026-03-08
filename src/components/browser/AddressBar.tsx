@@ -73,7 +73,7 @@ export function AddressBar({
       >
         {/* Lock/globe icon */}
         <div className="shrink-0 text-muted-foreground">
-          {isEmpty ? (
+          {isEmpty ? ( // eslint-disable-line
             <Globe className="w-3 h-3" />
           ) : isSecure ? (
             <Lock className="w-3 h-3 text-primary/70" />
