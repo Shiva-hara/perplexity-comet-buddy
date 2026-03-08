@@ -22,7 +22,7 @@ const QUICK_PROMPTS = [
   "Find remote jobs for freshers",
 ];
 
-export function ChatAssistant({ onClose, currentUrl }: ChatAssistantProps) {
+export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistantProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
