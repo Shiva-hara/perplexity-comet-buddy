@@ -29,19 +29,8 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
     if (e.key === "Enter") handleSearch();
   };
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  const dateStr = now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
-
   return (
     <div className="flex flex-col items-center justify-center min-h-full bg-background px-6 py-12 select-none">
-      {/* Time & Date */}
-      <div className="text-center mb-10">
-        <div className="text-6xl font-extralight text-foreground tabular-nums tracking-tight">
-          {timeStr}
-        </div>
-        <div className="text-muted-foreground text-sm mt-1">{dateStr}</div>
-      </div>
 
       {/* Comet branding */}
       <div className="flex items-center gap-2 mb-8">
