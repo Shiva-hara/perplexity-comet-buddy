@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { Send, X, Bot, Loader2, Trash2 } from "lucide-react";
+import { useState, useRef, useEffect, KeyboardEvent, useCallback } from "react";
+import { Send, X, Bot, Loader2, Trash2, Mic, MicOff } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 
