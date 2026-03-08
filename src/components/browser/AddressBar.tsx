@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X, Bot, Briefcase } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X, Bot, Briefcase, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface AddressBarProps {
   url: string;
