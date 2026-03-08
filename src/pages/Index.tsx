@@ -3,10 +3,9 @@ import { useTabs } from "@/hooks/useTabs";
 import { TabBar } from "@/components/browser/TabBar";
 import { AddressBar } from "@/components/browser/AddressBar";
 import { WebFrame } from "@/components/browser/WebFrame";
-import { AISidebar } from "@/components/browser/AISidebar";
+import { ChatAssistant } from "@/components/browser/ChatAssistant";
 import { CommandPalette } from "@/components/browser/CommandPalette";
 import { normalizeUrl } from "@/hooks/useTabs";
-import { PerplexityMessage } from "@/hooks/usePerplexity";
 
 const Index = () => {
   const {
