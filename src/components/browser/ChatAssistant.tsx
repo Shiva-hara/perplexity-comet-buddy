@@ -12,6 +12,7 @@ export interface ChatMessage {
 interface ChatAssistantProps {
   onClose: () => void;
   currentUrl?: string;
+  onNavigate?: (url: string) => void;
 }
 
 const QUICK_PROMPTS = [
