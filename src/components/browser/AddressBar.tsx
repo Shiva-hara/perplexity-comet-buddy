@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AddressBarProps {
