@@ -128,9 +128,9 @@ export function AddressBar({
         title="My Profile"
         className={cn(
           "flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
-          hasProfile
+        hasProfile
             ? "bg-surface border border-[#6366f1]/50 text-[#a5b4fc] hover:border-[#6366f1]"
-            : "bg-[rgba(99,102,241,0.2)] border border-[#6366f1] text-[#a5b4fc] animate-pulse"
+            : "bg-[rgba(99,102,241,0.2)] border border-[#6366f1] text-[#a5b4fc]"
         )}
       >
         <UserCircle className="w-3.5 h-3.5" />
