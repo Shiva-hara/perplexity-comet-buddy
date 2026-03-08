@@ -108,7 +108,7 @@ export function WebFrame({ url, onTitleChange, onLoadingChange, onNavigate }: We
 
   if (isNewTab) {
     return (
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 w-full overflow-auto">
         <NewTabPage onNavigate={onNavigate} />
       </div>
     );
