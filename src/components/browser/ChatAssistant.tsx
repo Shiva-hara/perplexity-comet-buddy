@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { Send, X, Bot, Loader2, Trash2 } from "lucide-react";
+import { useState, useRef, useEffect, KeyboardEvent, useCallback } from "react";
+import { Send, X, Bot, Loader2, Trash2, Mic, MicOff } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 
@@ -26,9 +26,51 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const recognitionRef = useRef<unknown>(null);
+
+  const stopMic = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (recognitionRef.current as any)?.stop();
+    recognitionRef.current = null;
+    setIsListening(false);
+  }, []);
+
+  const toggleMic = useCallback(() => {
+    if (isListening) { stopMic(); return; }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+
+    const rec = new SR();
+    rec.lang = "en-IN";
+    rec.continuous = false;
+    rec.interimResults = true;
+    recognitionRef.current = rec;
+    setIsListening(true);
+
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = Array.from(e.results)
+        .map((r: SpeechRecognitionResult) => r[0].transcript)
+        .join("");
+      setInput(transcript);
+    };
+
+    rec.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+      setInput((prev) => {
+        if (prev.trim()) setTimeout(() => sendMessage(prev), 100);
+        return prev;
+      });
+    };
+
+    rec.onerror = () => { setIsListening(false); recognitionRef.current = null; };
+    rec.start();
+  }, [isListening, stopMic]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -257,17 +299,34 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
 
       {/* Input */}
       <div className="px-3 pb-3 pt-2 border-t border-border shrink-0">
-        <div className="flex items-end gap-2 bg-surface border border-border rounded-xl px-3 py-2 focus-within:border-primary/50 transition-colors">
+        <div className={cn(
+          "flex items-end gap-2 bg-surface border rounded-xl px-3 py-2 transition-colors",
+          isListening ? "border-destructive/60 shadow-[0_0_8px_hsl(var(--destructive)/0.3)]" : "border-border focus-within:border-primary/50"
+        )}>
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Give Comet a task to execute..."
+            placeholder={isListening ? "Listening... speak now 🎤" : "Give Comet a task to execute..."}
             rows={1}
             className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none resize-none max-h-24 overflow-y-auto"
             style={{ lineHeight: "1.5" }}
           />
+          {/* Mic button */}
+          <button
+            onClick={toggleMic}
+            title={isListening ? "Stop listening" : "Speak to Comet"}
+            className={cn(
+              "shrink-0 w-6 h-6 rounded-lg flex items-center justify-center transition-all",
+              isListening
+                ? "bg-destructive/20 text-destructive hover:bg-destructive/30 animate-pulse"
+                : "bg-surface text-muted-foreground hover:text-foreground hover:bg-surface/80"
+            )}
+          >
+            {isListening ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
+          </button>
+          {/* Send / Stop button */}
           <button
             onClick={() => {
               if (isLoading) {
@@ -291,7 +350,7 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
           </button>
         </div>
         <p className="text-[10px] text-muted-foreground/40 mt-1.5 text-center">
-          ⏎ to send · Shift+⏎ newline
+          ⏎ to send · 🎤 speak · Shift+⏎ newline
         </p>
       </div>
     </div>
