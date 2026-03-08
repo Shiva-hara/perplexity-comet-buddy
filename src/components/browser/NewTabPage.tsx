@@ -1,4 +1,4 @@
-import { useState, useCallback, KeyboardEvent } from "react";
+import { useState, useRef, useCallback, KeyboardEvent } from "react";
 import { Search, Briefcase, Mic, MicOff } from "lucide-react";
 import { normalizeUrl } from "@/hooks/useTabs";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,14 @@ const quickLinks = [
 export function NewTabPage({ onNavigate }: NewTabPageProps) {
   const [query, setQuery] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const latestQueryRef = useRef("");
+
+  // Keep ref in sync so onend closure can read latest value
+  const updateQuery = (val: string) => {
+    setQuery(val);
+    latestQueryRef.current = val;
+  };
 
   const handleSearch = () => {
     if (!query.trim()) return;
@@ -31,38 +39,73 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
     if (e.key === "Enter") handleSearch();
   };
 
+  const stopMic = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    setIsListening(false);
+  }, []);
+
   const toggleMic = useCallback(() => {
+    // Stop if already running
+    if (isListening) {
+      stopMic();
+      return;
+    }
+
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert("Speech recognition is not supported in this browser.");
-      return;
-    }
-
-    if (isListening) {
-      setIsListening(false);
+      alert("Voice search requires Chrome or Edge browser.");
       return;
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
+    recognition.lang = "en-IN";        // Indian English
+    recognition.interimResults = true; // Show words as you speak
     recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    recognitionRef.current = recognition;
 
     recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setQuery(transcript);
-      // Auto-search after voice input
-      setTimeout(() => onNavigate(normalizeUrl(transcript)), 300);
+      let interim = "";
+      let final = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) final += t;
+        else interim += t;
+      }
+      const text = final || interim;
+      updateQuery(text);
     };
 
-    recognition.start();
-  }, [isListening, onNavigate]);
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+      const captured = latestQueryRef.current.trim();
+      if (captured) {
+        setTimeout(() => onNavigate(normalizeUrl(captured)), 200);
+      }
+    };
+
+    recognition.onerror = (e: any) => {
+      console.error("Speech recognition error:", e.error);
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    try {
+      recognition.start();
+    } catch (err) {
+      console.error("Failed to start mic:", err);
+      setIsListening(false);
+    }
+  }, [isListening, stopMic, onNavigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full bg-background px-6 py-12 select-none">
@@ -79,7 +122,7 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
       {/* Search bar */}
       <div className="w-full max-w-xl mb-8">
         <div className="flex items-center gap-2">
-          {/* Search input with icon */}
+          {/* Search input */}
           <div className={cn(
             "relative flex-1 flex items-center border rounded-xl bg-surface transition-all",
             isListening
@@ -90,9 +133,9 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => updateQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isListening ? "Listening..." : "Search jobs, companies, or enter a URL..."}
+              placeholder={isListening ? "🎙 Listening..." : "Search jobs, companies, or enter a URL..."}
               autoFocus
               className="w-full h-12 pl-10 pr-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 outline-none"
             />
@@ -105,7 +148,7 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
             className={cn(
               "flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl border transition-all",
               isListening
-                ? "bg-primary/10 border-primary text-primary animate-pulse"
+                ? "bg-primary border-primary text-primary-foreground shadow-[0_0_12px_hsl(var(--primary)/0.5)] animate-pulse"
                 : "bg-surface border-border text-muted-foreground hover:text-primary hover:border-primary/50"
             )}
           >
@@ -121,9 +164,10 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
             Search
           </button>
         </div>
+
         {isListening && (
           <p className="text-center text-xs text-primary mt-2 animate-pulse">
-            🎙 Listening... speak your search
+            🎙 Speak now — auto-searches when you stop
           </p>
         )}
       </div>
