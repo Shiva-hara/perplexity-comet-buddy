@@ -15,7 +15,6 @@ export interface Tab {
   history: string[];
   historyIndex: number;
   messages: Message[];
-  favicon?: string;
 }
 
 function createTab(url = ""): Tab {
@@ -31,20 +30,11 @@ function createTab(url = ""): Tab {
   };
 }
 
-export function useTabs() {
-  const [tabs, setTabs] = useState<Tab[]>([createTab()]);
-  const [activeTabId, setActiveTabId] = useState<string>(() => {
-    const tab = createTab();
-    return tab.id;
-  });
+const initialTab = createTab();
 
-  // Initialize properly
-  const [initialized] = useState(() => {
-    const initialTab = createTab();
-    setTabs([initialTab]);
-    setActiveTabId(initialTab.id);
-    return true;
-  });
+export function useTabs() {
+  const [tabs, setTabs] = useState<Tab[]>([initialTab]);
+  const [activeTabId, setActiveTabId] = useState<string>(initialTab.id);
 
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs[0];
 
@@ -55,97 +45,70 @@ export function useTabs() {
     return tab.id;
   }, []);
 
-  const closeTab = useCallback(
-    (id: string) => {
-      setTabs((prev) => {
-        if (prev.length === 1) return [createTab()];
-        const next = prev.filter((t) => t.id !== id);
-        return next;
+  const closeTab = useCallback((id: string) => {
+    setTabs((prev) => {
+      if (prev.length === 1) {
+        const fresh = createTab();
+        setActiveTabId(fresh.id);
+        return [fresh];
+      }
+      const idx = prev.findIndex((t) => t.id === id);
+      const next = prev.filter((t) => t.id !== id);
+      setActiveTabId((prevActive) => {
+        if (prevActive !== id) return prevActive;
+        const newIdx = Math.max(0, idx - 1);
+        return next[newIdx]?.id ?? next[0]?.id ?? "";
       });
-      setActiveTabId((prev) => {
-        if (prev !== id) return prev;
-        const remaining = tabs.filter((t) => t.id !== id);
-        return remaining[remaining.length - 1]?.id ?? tabs[0]?.id ?? "";
-      });
-    },
-    [tabs]
-  );
+      return next;
+    });
+  }, []);
 
   const updateTab = useCallback((id: string, updates: Partial<Tab>) => {
     setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
   }, []);
 
   const navigate = useCallback(
-    (url: string) => {
-      if (!activeTab) return;
+    (url: string, tabId?: string) => {
+      const id = tabId ?? activeTab?.id;
+      if (!id) return;
+      const tab = tabs.find((t) => t.id === id) ?? activeTab;
+      if (!tab) return;
       const normalizedUrl = normalizeUrl(url);
-      const newHistory = activeTab.history.slice(0, activeTab.historyIndex + 1);
+      const newHistory = tab.history.slice(0, tab.historyIndex + 1);
       newHistory.push(normalizedUrl);
-      updateTab(activeTab.id, {
+      updateTab(id, {
         url: normalizedUrl,
         displayUrl: normalizedUrl,
         isLoading: true,
         history: newHistory,
         historyIndex: newHistory.length - 1,
-        title: "Loading...",
+        title: "Loading…",
       });
     },
-    [activeTab, updateTab]
+    [activeTab, tabs, updateTab]
   );
 
   const goBack = useCallback(() => {
     if (!activeTab || activeTab.historyIndex <= 0) return;
     const newIndex = activeTab.historyIndex - 1;
     const url = activeTab.history[newIndex];
-    updateTab(activeTab.id, {
-      url,
-      displayUrl: url,
-      historyIndex: newIndex,
-      isLoading: true,
-    });
+    updateTab(activeTab.id, { url, displayUrl: url, historyIndex: newIndex, isLoading: true });
   }, [activeTab, updateTab]);
 
   const goForward = useCallback(() => {
     if (!activeTab || activeTab.historyIndex >= activeTab.history.length - 1) return;
     const newIndex = activeTab.historyIndex + 1;
     const url = activeTab.history[newIndex];
-    updateTab(activeTab.id, {
-      url,
-      displayUrl: url,
-      historyIndex: newIndex,
-      isLoading: true,
-    });
+    updateTab(activeTab.id, { url, displayUrl: url, historyIndex: newIndex, isLoading: true });
   }, [activeTab, updateTab]);
 
   const refresh = useCallback(() => {
-    if (!activeTab || !activeTab.url) return;
-    updateTab(activeTab.id, { isLoading: true });
-    // Force iframe reload by temporarily changing URL
+    if (!activeTab?.url) return;
     const url = activeTab.url;
-    updateTab(activeTab.id, { url: "", isLoading: true });
-    setTimeout(() => updateTab(activeTab.id, { url, isLoading: true }), 50);
+    const id = activeTab.id;
+    updateTab(id, { url: "", isLoading: true });
+    setTimeout(() => updateTab(id, { url, isLoading: true }), 30);
   }, [activeTab, updateTab]);
-
-  const addMessage = useCallback(
-    (message: Message) => {
-      if (!activeTab) return;
-      updateTab(activeTab.id, {
-        messages: [...activeTab.messages, message],
-      });
-    },
-    [activeTab, updateTab]
-  );
-
-  const updateLastMessage = useCallback(
-    (content: string, citations?: string[]) => {
-      if (!activeTab) return;
-      const msgs = [...activeTab.messages];
-      if (msgs.length === 0) return;
-      msgs[msgs.length - 1] = { ...msgs[msgs.length - 1], content, citations };
-      updateTab(activeTab.id, { messages: msgs });
-    },
-    [activeTab, updateTab]
-  );
 
   return {
     tabs,
@@ -159,8 +122,6 @@ export function useTabs() {
     goBack,
     goForward,
     refresh,
-    addMessage,
-    updateLastMessage,
     canGoBack: (activeTab?.historyIndex ?? 0) > 0,
     canGoForward: (activeTab?.historyIndex ?? 0) < (activeTab?.history.length ?? 0) - 1,
   };
@@ -169,10 +130,7 @@ export function useTabs() {
 export function normalizeUrl(input: string): string {
   const trimmed = input.trim();
   if (!trimmed) return "";
-  // If it looks like a URL (has dots and no spaces, or starts with http)
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
-  // Has a dot and no spaces — treat as domain
-  if (/^[^\\s]+\.[^\\s]+$/.test(trimmed)) return `https://${trimmed}`;
-  // Otherwise treat as a Perplexity search
+  if (/^[^\s]+\.[^\s]+$/.test(trimmed)) return `https://${trimmed}`;
   return `https://www.perplexity.ai/search?q=${encodeURIComponent(trimmed)}`;
 }
