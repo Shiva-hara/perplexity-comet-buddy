@@ -83,9 +83,9 @@ const Index = () => {
       />
 
       {/* Main content area */}
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden">
         {/* Web Frame */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 min-w-0 overflow-hidden">
           {activeTab && (
             <WebFrame
               key={activeTab.id}
