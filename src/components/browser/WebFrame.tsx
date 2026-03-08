@@ -32,6 +32,9 @@ export function WebFrame({ url, onTitleChange, onLoadingChange, onNavigate }: We
 
   const isNewTab = !url;
 
+  // Immediately mark known-blocked sites without waiting
+  const isBlocked = blocked || (!!url && isKnownBlocked(url));
+
   const handleLoad = useCallback(() => {
     clearTimeout(loadTimerRef.current);
     setBlocked(false);
