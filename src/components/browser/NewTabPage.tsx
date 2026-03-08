@@ -1,6 +1,7 @@
-import { useState, KeyboardEvent } from "react";
-import { Search, Briefcase } from "lucide-react";
+import { useState, useCallback, KeyboardEvent } from "react";
+import { Search, Briefcase, Mic, MicOff } from "lucide-react";
 import { normalizeUrl } from "@/hooks/useTabs";
+import { cn } from "@/lib/utils";
 
 interface NewTabPageProps {
   onNavigate: (url: string) => void;
@@ -19,6 +20,7 @@ const quickLinks = [
 
 export function NewTabPage({ onNavigate }: NewTabPageProps) {
   const [query, setQuery] = useState("");
+  const [isListening, setIsListening] = useState(false);
 
   const handleSearch = () => {
     if (!query.trim()) return;
@@ -28,6 +30,39 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleSearch();
   };
+
+  const toggleMic = useCallback(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setQuery(transcript);
+      // Auto-search after voice input
+      setTimeout(() => onNavigate(normalizeUrl(transcript)), 300);
+    };
+
+    recognition.start();
+  }, [isListening, onNavigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full bg-background px-6 py-12 select-none">
@@ -50,10 +85,28 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search jobs, companies, or enter a URL..."
+            placeholder={isListening ? "Listening..." : "Search jobs, companies, or enter a URL..."}
             autoFocus
-            className="w-full h-12 pl-10 pr-24 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.12)] transition-all"
+            className={cn(
+              "w-full h-12 pl-10 pr-24 bg-surface border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 outline-none transition-all",
+              isListening
+                ? "border-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.2)] placeholder:text-primary/70"
+                : "border-border focus:border-primary/50 focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.12)]"
+            )}
           />
+          {/* Mic button */}
+          <button
+            onClick={toggleMic}
+            title={isListening ? "Stop listening" : "Search by voice"}
+            className={cn(
+              "absolute right-14 w-8 h-8 flex items-center justify-center rounded-lg transition-all",
+              isListening
+                ? "text-primary animate-pulse"
+                : "text-muted-foreground hover:text-primary hover:bg-surface"
+            )}
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </button>
           <button
             onClick={handleSearch}
             disabled={!query.trim()}
@@ -62,6 +115,11 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
             Search
           </button>
         </div>
+        {isListening && (
+          <p className="text-center text-xs text-primary mt-2 animate-pulse">
+            🎙 Listening... speak your search
+          </p>
+        )}
       </div>
 
       {/* Quick links */}
