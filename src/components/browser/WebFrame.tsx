@@ -1,6 +1,21 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
+import { AlertCircle, ExternalLink, RefreshCw, ShieldX } from "lucide-react";
 import { NewTabPage } from "./NewTabPage";
+
+// Sites known to block iframes — show the blocked page immediately
+const IFRAME_BLOCKED_DOMAINS = [
+  "linkedin.com", "google.com", "facebook.com", "instagram.com",
+  "twitter.com", "x.com", "naukri.com", "indeed.com", "glassdoor.com",
+  "amazon.com", "flipkart.com", "youtube.com", "github.com",
+  "wellfound.com", "monster.com", "shine.com", "internshala.com",
+];
+
+function isKnownBlocked(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.replace("www.", "");
+    return IFRAME_BLOCKED_DOMAINS.some((d) => hostname === d || hostname.endsWith("." + d));
+  } catch { return false; }
+}
 
 interface WebFrameProps {
   url: string;
@@ -16,6 +31,9 @@ export function WebFrame({ url, onTitleChange, onLoadingChange, onNavigate }: We
   const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const isNewTab = !url;
+
+  // Immediately mark known-blocked sites without waiting
+  const isBlocked = blocked || (!!url && isKnownBlocked(url));
 
   const handleLoad = useCallback(() => {
     clearTimeout(loadTimerRef.current);
@@ -55,30 +73,35 @@ export function WebFrame({ url, onTitleChange, onLoadingChange, onNavigate }: We
       return;
     }
 
+    // Instantly handle known-blocked sites
+    if (isKnownBlocked(url)) {
+      onLoadingChange(false);
+      try {
+        const hostname = new URL(url).hostname.replace("www.", "");
+        onTitleChange(hostname);
+      } catch { onTitleChange("Blocked"); }
+      return;
+    }
+
     setBlocked(false);
     setLoadError(false);
     onLoadingChange(true);
 
-    // Detect blocked iframes via a timing heuristic
-    // If the iframe doesn't load within 8s and shows no content, it's likely blocked
     loadTimerRef.current = setTimeout(() => {
       try {
         const doc = iframeRef.current?.contentDocument;
-        // If we can't access document at all, it loaded cross-origin (may be fine)
-        // If we get an empty document, it's likely blocked
         if (doc && doc.body && doc.body.innerHTML === "") {
           setBlocked(true);
           onLoadingChange(false);
           try {
             const hostname = new URL(url).hostname.replace("www.", "");
-            onTitleChange(hostname + " (blocked)");
+            onTitleChange(hostname);
           } catch { onTitleChange("Blocked"); }
         }
       } catch {
-        // Cross-origin, likely loaded fine
         onLoadingChange(false);
       }
-    }, 5000);
+    }, 3000);
 
     return () => clearTimeout(loadTimerRef.current);
   }, [url]);
@@ -91,7 +114,7 @@ export function WebFrame({ url, onTitleChange, onLoadingChange, onNavigate }: We
     );
   }
 
-  if (blocked || loadError) {
+  if (isBlocked || loadError) {
     return (
       <BlockedPage
         url={url}
@@ -130,22 +153,27 @@ function BlockedPage({
   onRetry: () => void;
 }) {
   let hostname = url;
-  try { hostname = new URL(url).hostname; } catch { /* */ }
+  try { hostname = new URL(url).hostname.replace("www.", ""); } catch { /* */ }
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center bg-background px-6 text-center">
       <div className="w-16 h-16 rounded-2xl bg-surface border border-border flex items-center justify-center mb-5">
-        <AlertCircle className="w-8 h-8 text-muted-foreground" />
+        <ShieldX className="w-8 h-8 text-muted-foreground" />
       </div>
 
       <h2 className="text-lg font-semibold text-foreground mb-2">
-        {reason === "blocked" ? `${hostname} can't be displayed here` : "Failed to load"}
+        {reason === "blocked" ? `${hostname} blocks embedded browsing` : "Failed to load"}
       </h2>
-      <p className="text-sm text-muted-foreground max-w-sm mb-6">
+      <p className="text-sm text-muted-foreground max-w-sm mb-2">
         {reason === "blocked"
-          ? "This site has security policies that prevent it from loading inside another page. You can still open it in a new window or ask the AI to research it."
+          ? "This site uses security headers that prevent it from loading inside another page — this affects all iframe-based browsers."
           : "The page couldn't be loaded. Check your connection or try again."}
       </p>
+      {reason === "blocked" && (
+        <p className="text-xs text-primary/70 max-w-sm mb-6">
+          💡 Use <strong>"Open in new window"</strong> to visit the site, then ask Comet to help you navigate it.
+        </p>
+      )}
 
       <div className="flex gap-3">
         <button
@@ -155,13 +183,15 @@ function BlockedPage({
           <ExternalLink className="w-3.5 h-3.5" />
           Open in new window
         </button>
-        <button
-          onClick={onRetry}
-          className="flex items-center gap-2 h-9 px-4 bg-surface border border-border text-foreground rounded-lg text-sm font-medium hover:bg-surface/80 transition-colors"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Retry
-        </button>
+        {reason === "error" && (
+          <button
+            onClick={onRetry}
+            className="flex items-center gap-2 h-9 px-4 bg-surface border border-border text-foreground rounded-lg text-sm font-medium hover:bg-surface/80 transition-colors"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        )}
       </div>
     </div>
   );
