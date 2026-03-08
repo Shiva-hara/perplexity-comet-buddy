@@ -30,7 +30,7 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<unknown>(null);
 
   const stopMic = useCallback(() => {
     recognitionRef.current?.stop();
