@@ -396,7 +396,16 @@ export default function ProfileSetup({ onComplete }: { onComplete?: () => void }
           <Sparkles size={18} style={{ color: "#6366f1" }} />
           <span className="text-sm font-semibold" style={{ color: "#e2e8f0" }}>Comet Setup</span>
         </div>
-        <span className="text-xs" style={{ color: "#64748b" }}>Step {step} of {TOTAL_STEPS}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs" style={{ color: "#64748b" }}>Step {step} of {TOTAL_STEPS}</span>
+          <button
+            onClick={() => onComplete?.()}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all duration-150 hover:scale-105"
+            style={{ background: "#12121a", border: "1px solid #1e1e2e", color: "#64748b" }}
+          >
+            <X size={12} /> Exit to Browser
+          </button>
+        </div>
       </div>
 
       {/* ── Progress bar ── */}
