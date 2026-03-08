@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent } from "react";
-import { Search, Zap } from "lucide-react";
+import { Search, Briefcase } from "lucide-react";
 import { normalizeUrl } from "@/hooks/useTabs";
 
 interface NewTabPageProps {
@@ -7,14 +7,14 @@ interface NewTabPageProps {
 }
 
 const quickLinks = [
-  { label: "Perplexity", url: "https://www.perplexity.ai", icon: "🔍" },
-  { label: "GitHub", url: "https://github.com", icon: "🐙" },
-  { label: "YouTube", url: "https://www.youtube.com", icon: "▶️" },
-  { label: "Wikipedia", url: "https://www.wikipedia.org", icon: "📚" },
-  { label: "Reddit", url: "https://www.reddit.com", icon: "🤖" },
-  { label: "Hacker News", url: "https://news.ycombinator.com", icon: "🟧" },
-  { label: "Stack Overflow", url: "https://stackoverflow.com", icon: "💬" },
-  { label: "MDN", url: "https://developer.mozilla.org", icon: "🦊" },
+  { label: "LinkedIn", url: "https://www.linkedin.com/jobs", icon: "💼" },
+  { label: "Naukri", url: "https://www.naukri.com", icon: "🏢" },
+  { label: "Indeed", url: "https://www.indeed.com", icon: "🔎" },
+  { label: "Internshala", url: "https://internshala.com", icon: "🎓" },
+  { label: "Glassdoor", url: "https://www.glassdoor.com", icon: "⭐" },
+  { label: "Wellfound", url: "https://wellfound.com/jobs", icon: "🚀" },
+  { label: "Monster", url: "https://www.monsterindia.com", icon: "👾" },
+  { label: "Shine", url: "https://www.shine.com", icon: "✨" },
 ];
 
 export function NewTabPage({ onNavigate }: NewTabPageProps) {
@@ -32,16 +32,14 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-full bg-background px-6 py-12 select-none">
 
-      {/* Comet branding */}
-      <div className="flex items-center gap-2 mb-8">
+      {/* Branding */}
+      <div className="flex items-center gap-2 mb-2">
         <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <Zap className="w-4 h-4 text-primary fill-primary" />
+          <Briefcase className="w-4 h-4 text-primary" />
         </div>
-        <span className="text-xl font-semibold text-foreground">Comet</span>
-        <span className="text-xs text-muted-foreground bg-surface border border-border px-2 py-0.5 rounded-full">
-          by Perplexity
-        </span>
+        <span className="text-xl font-semibold text-foreground">Job Search</span>
       </div>
+      <p className="text-xs text-muted-foreground mb-8">Find your next opportunity</p>
 
       {/* Search bar */}
       <div className="w-full max-w-xl mb-8">
@@ -52,7 +50,7 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask anything or enter a URL..."
+            placeholder="Search jobs, companies, or enter a URL..."
             autoFocus
             className="w-full h-12 pl-10 pr-24 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.12)] transition-all"
           />
@@ -68,7 +66,7 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
 
       {/* Quick links */}
       <div className="w-full max-w-xl">
-        <p className="text-xs text-muted-foreground mb-3 text-center">Quick Access</p>
+        <p className="text-xs text-muted-foreground mb-3 text-center">Top Job Sites</p>
         <div className="grid grid-cols-4 gap-3">
           {quickLinks.map((link) => (
             <button
@@ -84,11 +82,6 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
           ))}
         </div>
       </div>
-
-      {/* AI hint */}
-      <p className="mt-10 text-xs text-muted-foreground/50 text-center">
-        Click <span className="text-primary">⚡ Comet</span> in the toolbar to open the AI sidebar
-      </p>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, Zap, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AddressBarProps {
@@ -116,19 +116,6 @@ export function AddressBar({
         )}
       </div>
 
-      {/* Comet AI toggle */}
-      <button
-        onClick={onToggleSidebar}
-        className={cn(
-          "flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
-          sidebarOpen
-            ? "bg-primary text-primary-foreground shadow-[0_0_10px_hsl(var(--primary)/0.4)]"
-            : "bg-surface border border-border text-muted-foreground hover:text-primary hover:border-primary/50"
-        )}
-      >
-        <Zap className={cn("w-3.5 h-3.5", sidebarOpen && "fill-current")} />
-        <span>Comet</span>
-      </button>
     </div>
   );
 }
