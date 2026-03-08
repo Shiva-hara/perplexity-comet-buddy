@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Check, ChevronRight, ChevronLeft, Upload, Plus, X, Star, Sparkles, Rocket, User, GraduationCap, Code2, Target, FileText } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, Upload, Plus, X, Sparkles, Rocket, User, GraduationCap, Code2, Target, FileText } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Project {
@@ -222,7 +221,6 @@ const NavButtons = ({ step, totalSteps, onBack, onNext, nextLabel }: {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function ProfileSetup({ onComplete }: { onComplete?: () => void }) {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [slideDir, setSlideDir] = useState<"left" | "right">("right");
   const [isAnimating, setIsAnimating] = useState(false);
@@ -309,7 +307,6 @@ export default function ProfileSetup({ onComplete }: { onComplete?: () => void }
     setDone(true);
     setTimeout(() => {
       if (onComplete) onComplete();
-      else navigate("/");
     }, 4000);
   };
 
@@ -370,7 +367,7 @@ export default function ProfileSetup({ onComplete }: { onComplete?: () => void }
           </div>
 
           <button
-            onClick={() => { if (onComplete) onComplete(); else navigate("/"); }}
+            onClick={() => { if (onComplete) onComplete(); }}
             className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-semibold mx-auto transition-all duration-200 hover:scale-105 active:scale-95"
             style={{ background: "linear-gradient(135deg, #6366f1, #4f52d4)", color: "#fff", boxShadow: "0 8px 30px rgba(99,102,241,0.5)" }}
           >
