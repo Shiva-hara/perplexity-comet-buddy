@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, KeyboardEvent } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTabs } from "@/hooks/useTabs";
 import { TabBar } from "@/components/browser/TabBar";
 import { AddressBar } from "@/components/browser/AddressBar";
@@ -26,7 +26,6 @@ const Index = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [tabMessages, setTabMessages] = useState<Record<string, PerplexityMessage[]>>({});
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -48,33 +47,8 @@ const Index = () => {
     (url: string) => {
       const normalized = normalizeUrl(url);
       navigate(normalized);
-      // If it's a Perplexity search, also open the AI sidebar
-      if (!normalized.startsWith("http") || normalized.includes("perplexity.ai/search")) {
-        setSidebarOpen(true);
-      }
     },
     [navigate]
-  );
-
-  const handleAISearch = useCallback((query: string) => {
-    setSidebarOpen(true);
-    const id = activeTab?.id;
-    if (!id) return;
-    // Inject the query as a pre-filled message prompt  
-    setTabMessages((prev) => {
-      const msgs = prev[id] ?? [];
-      return { ...prev, [id]: [...msgs, { role: "user" as const, content: query }] };
-    });
-  }, [activeTab]);
-
-  const currentMessages: PerplexityMessage[] = (activeTab ? tabMessages[activeTab.id] : undefined) ?? [];
-
-  const setCurrentMessages = useCallback(
-    (msgs: PerplexityMessage[]) => {
-      if (!activeTab) return;
-      setTabMessages((prev) => ({ ...prev, [activeTab.id]: msgs }));
-    },
-    [activeTab]
   );
 
   return (
@@ -117,12 +91,10 @@ const Index = () => {
           )}
         </div>
 
-        {/* AI Sidebar */}
-        {sidebarOpen && activeTab && (
-          <AISidebar
-            currentUrl={activeTab.url}
-            messages={currentMessages}
-            onMessagesChange={setCurrentMessages}
+        {/* Chat Assistant Sidebar */}
+        {sidebarOpen && (
+          <ChatAssistant
+            currentUrl={activeTab?.url}
             onClose={() => setSidebarOpen(false)}
           />
         )}
@@ -135,7 +107,7 @@ const Index = () => {
         onNavigate={handleNavigate}
         onAISearch={(query) => {
           setCommandOpen(false);
-          handleAISearch(query);
+          setSidebarOpen(true);
         }}
         currentUrl={activeTab?.url ?? ""}
       />
