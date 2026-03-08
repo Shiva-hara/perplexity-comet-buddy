@@ -1,6 +1,21 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
+import { AlertCircle, ExternalLink, RefreshCw, ShieldX } from "lucide-react";
 import { NewTabPage } from "./NewTabPage";
+
+// Sites known to block iframes — show the blocked page immediately
+const IFRAME_BLOCKED_DOMAINS = [
+  "linkedin.com", "google.com", "facebook.com", "instagram.com",
+  "twitter.com", "x.com", "naukri.com", "indeed.com", "glassdoor.com",
+  "amazon.com", "flipkart.com", "youtube.com", "github.com",
+  "wellfound.com", "monster.com", "shine.com", "internshala.com",
+];
+
+function isKnownBlocked(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.replace("www.", "");
+    return IFRAME_BLOCKED_DOMAINS.some((d) => hostname === d || hostname.endsWith("." + d));
+  } catch { return false; }
+}
 
 interface WebFrameProps {
   url: string;
