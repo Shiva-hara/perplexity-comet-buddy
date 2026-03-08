@@ -1,4 +1,4 @@
-import { useState, useCallback, KeyboardEvent } from "react";
+import { useState, useRef, useCallback, KeyboardEvent } from "react";
 import { Search, Briefcase, Mic, MicOff } from "lucide-react";
 import { normalizeUrl } from "@/hooks/useTabs";
 import { cn } from "@/lib/utils";
