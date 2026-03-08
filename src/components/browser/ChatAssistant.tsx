@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Send, X, Bot, Loader2, Trash2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 
