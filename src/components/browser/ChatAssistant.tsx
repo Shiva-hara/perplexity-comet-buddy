@@ -301,7 +301,7 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
       <div className="px-3 pb-3 pt-2 border-t border-border shrink-0">
         <div className={cn(
           "flex items-end gap-2 bg-surface border rounded-xl px-3 py-2 transition-colors",
-          isListening ? "border-red-500/60 shadow-[0_0_8px_rgba(239,68,68,0.3)]" : "border-border focus-within:border-primary/50"
+          isListening ? "border-destructive/60 shadow-[0_0_8px_hsl(var(--destructive)/0.3)]" : "border-border focus-within:border-primary/50"
         )}>
           <textarea
             ref={inputRef}
@@ -320,7 +320,7 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
             className={cn(
               "shrink-0 w-6 h-6 rounded-lg flex items-center justify-center transition-all",
               isListening
-                ? "bg-red-500/20 text-red-400 hover:bg-red-500/30 animate-pulse"
+                ? "bg-destructive/20 text-destructive hover:bg-destructive/30 animate-pulse"
                 : "bg-surface text-muted-foreground hover:text-foreground hover:bg-surface/80"
             )}
           >
