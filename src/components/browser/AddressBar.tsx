@@ -57,9 +57,9 @@ export function AddressBar({
   const isEmpty = !url;
 
   return (
-    <div className="flex items-center gap-1 h-11 px-3 bg-chrome border-b border-border">
+    <div className="flex items-center gap-1.5 h-11 px-3 bg-chrome border-b border-border">
       {/* Nav controls */}
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center gap-0.5 shrink-0">
         <NavButton onClick={onBack} disabled={!canGoBack} title="Go back">
           <ChevronLeft className="w-4 h-4" />
         </NavButton>
@@ -74,7 +74,7 @@ export function AddressBar({
       {/* Address bar */}
       <div
         className={cn(
-          "flex items-center gap-2 flex-1 h-7 px-3 rounded-lg bg-surface border transition-all duration-150",
+          "flex items-center gap-2 flex-1 h-8 px-3 rounded-lg bg-surface border transition-all duration-150",
           isFocused ? "border-primary/50 shadow-[0_0_0_2px_hsl(var(--primary)/0.15)]" : "border-border"
         )}
       >
@@ -127,8 +127,8 @@ export function AddressBar({
         onClick={() => navigate("/profile")}
         title="My Profile"
         className={cn(
-          "flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
-        hasProfile
+          "flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
+          hasProfile
             ? "bg-surface border border-[#6366f1]/50 text-[#a5b4fc] hover:border-[#6366f1]"
             : "bg-[rgba(99,102,241,0.2)] border border-[#6366f1] text-[#a5b4fc]"
         )}
@@ -142,7 +142,7 @@ export function AddressBar({
         onClick={onToggleTracker}
         title="Job Pipeline Tracker"
         className={cn(
-          "flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
+          "flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
           trackerOpen
             ? "bg-primary text-primary-foreground shadow-[0_0_10px_hsl(var(--primary)/0.4)]"
             : "bg-surface border border-border text-muted-foreground hover:text-primary hover:border-primary/50"
@@ -157,7 +157,7 @@ export function AddressBar({
         onClick={onToggleSidebar}
         title="AI Job Assistant"
         className={cn(
-          "flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
+          "flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
           sidebarOpen
             ? "bg-primary text-primary-foreground shadow-[0_0_10px_hsl(var(--primary)/0.4)]"
             : "bg-surface border border-border text-muted-foreground hover:text-primary hover:border-primary/50"
