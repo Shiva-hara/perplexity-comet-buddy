@@ -49,16 +49,20 @@ export function useTabs() {
     setTabs((prev) => {
       if (prev.length === 1) {
         const fresh = createTab();
-        setActiveTabId(fresh.id);
+        // schedule outside the updater to avoid nested setState
+        setTimeout(() => setActiveTabId(fresh.id), 0);
         return [fresh];
       }
       const idx = prev.findIndex((t) => t.id === id);
       const next = prev.filter((t) => t.id !== id);
-      setActiveTabId((prevActive) => {
-        if (prevActive !== id) return prevActive;
-        const newIdx = Math.max(0, idx - 1);
-        return next[newIdx]?.id ?? next[0]?.id ?? "";
-      });
+      // schedule outside the updater to avoid nested setState
+      setTimeout(() => {
+        setActiveTabId((prevActive) => {
+          if (prevActive !== id) return prevActive;
+          const newIdx = Math.max(0, idx - 1);
+          return next[newIdx]?.id ?? next[0]?.id ?? "";
+        });
+      }, 0);
       return next;
     });
   }, []);
