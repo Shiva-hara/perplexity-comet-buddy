@@ -114,7 +114,7 @@ export function WebFrame({ url, onTitleChange, onLoadingChange, onNavigate }: We
     );
   }
 
-  if (blocked || loadError) {
+  if (isBlocked || loadError) {
     return (
       <BlockedPage
         url={url}
