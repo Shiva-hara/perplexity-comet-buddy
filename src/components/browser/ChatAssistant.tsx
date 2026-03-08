@@ -33,7 +33,8 @@ export function ChatAssistant({ onClose, currentUrl, onNavigate }: ChatAssistant
   const recognitionRef = useRef<unknown>(null);
 
   const stopMic = useCallback(() => {
-    recognitionRef.current?.stop();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (recognitionRef.current as any)?.stop();
     recognitionRef.current = null;
     setIsListening(false);
   }, []);
