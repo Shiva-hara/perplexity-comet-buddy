@@ -121,10 +121,10 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
 
       {/* Search bar */}
       <div className="w-full max-w-xl mb-8">
-        <div className="flex items-center gap-2">
+        <div className="flex items-stretch gap-2 h-12">
           {/* Search input */}
           <div className={cn(
-            "relative flex-1 flex items-center border rounded-xl bg-surface transition-all",
+            "relative flex flex-1 items-center border rounded-xl bg-surface transition-all",
             isListening
               ? "border-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.2)]"
               : "border-border focus-within:border-primary/50 focus-within:shadow-[0_0_0_3px_hsl(var(--primary)/0.12)]"
@@ -137,7 +137,7 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
               onKeyDown={handleKeyDown}
               placeholder={isListening ? "🎙 Listening..." : "Search jobs, companies, or enter a URL..."}
               autoFocus
-              className="w-full h-12 pl-10 pr-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 outline-none"
+              className="w-full h-full pl-10 pr-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 outline-none"
             />
           </div>
 
@@ -146,7 +146,7 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
             onClick={toggleMic}
             title={isListening ? "Stop listening" : "Search by voice"}
             className={cn(
-              "flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl border transition-all",
+              "flex-shrink-0 w-12 flex items-center justify-center rounded-xl border transition-all",
               isListening
                 ? "bg-primary border-primary text-primary-foreground shadow-[0_0_12px_hsl(var(--primary)/0.5)] animate-pulse"
                 : "bg-surface border-border text-muted-foreground hover:text-primary hover:border-primary/50"
@@ -159,7 +159,7 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
           <button
             onClick={handleSearch}
             disabled={!query.trim()}
-            className="flex-shrink-0 h-12 px-5 bg-primary text-primary-foreground rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
+            className="flex-shrink-0 px-5 bg-primary text-primary-foreground rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
           >
             Search
           </button>
