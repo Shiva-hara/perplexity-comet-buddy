@@ -307,7 +307,6 @@ export default function ProfileSetup({ onComplete }: { onComplete?: () => void }
     setDone(true);
     setTimeout(() => {
       if (onComplete) onComplete();
-      else navigate("/");
     }, 4000);
   };
 
@@ -368,7 +367,7 @@ export default function ProfileSetup({ onComplete }: { onComplete?: () => void }
           </div>
 
           <button
-            onClick={() => { if (onComplete) onComplete(); else navigate("/"); }}
+            onClick={() => { if (onComplete) onComplete(); }}
             className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-semibold mx-auto transition-all duration-200 hover:scale-105 active:scale-95"
             style={{ background: "linear-gradient(135deg, #6366f1, #4f52d4)", color: "#fff", boxShadow: "0 8px 30px rgba(99,102,241,0.5)" }}
           >
