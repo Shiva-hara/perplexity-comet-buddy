@@ -78,39 +78,45 @@ export function NewTabPage({ onNavigate }: NewTabPageProps) {
 
       {/* Search bar */}
       <div className="w-full max-w-xl mb-8">
-        <div className="relative flex items-center">
-          <Search className="absolute left-4 w-4 h-4 text-muted-foreground pointer-events-none" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isListening ? "Listening..." : "Search jobs, companies, or enter a URL..."}
-            autoFocus
-            className={cn(
-              "w-full h-12 pl-10 pr-24 bg-surface border rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 outline-none transition-all",
-              isListening
-                ? "border-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.2)] placeholder:text-primary/70"
-                : "border-border focus:border-primary/50 focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.12)]"
-            )}
-          />
+        <div className="flex items-center gap-2">
+          {/* Search input with icon */}
+          <div className={cn(
+            "relative flex-1 flex items-center border rounded-xl bg-surface transition-all",
+            isListening
+              ? "border-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.2)]"
+              : "border-border focus-within:border-primary/50 focus-within:shadow-[0_0_0_3px_hsl(var(--primary)/0.12)]"
+          )}>
+            <Search className="absolute left-4 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={isListening ? "Listening..." : "Search jobs, companies, or enter a URL..."}
+              autoFocus
+              className="w-full h-12 pl-10 pr-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 outline-none"
+            />
+          </div>
+
           {/* Mic button */}
           <button
             onClick={toggleMic}
             title={isListening ? "Stop listening" : "Search by voice"}
             className={cn(
-              "absolute right-14 w-8 h-8 flex items-center justify-center rounded-lg transition-all",
+              "flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl border transition-all",
               isListening
-                ? "text-primary animate-pulse"
-                : "text-muted-foreground hover:text-primary hover:bg-surface"
+                ? "bg-primary/10 border-primary text-primary animate-pulse"
+                : "bg-surface border-border text-muted-foreground hover:text-primary hover:border-primary/50"
             )}
           >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </button>
+
+          {/* Search button */}
           <button
             onClick={handleSearch}
             disabled={!query.trim()}
-            className="absolute right-2 h-8 px-4 bg-primary text-primary-foreground rounded-lg text-xs font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
+            className="flex-shrink-0 h-12 px-5 bg-primary text-primary-foreground rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
           >
             Search
           </button>
