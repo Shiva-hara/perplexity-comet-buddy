@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X, Bot, Briefcase } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Lock, Globe, X, Bot, Briefcase, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface AddressBarProps {
   url: string;
@@ -34,6 +35,8 @@ export function AddressBar({
   const [inputValue, setInputValue] = useState(url);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const hasProfile = !!localStorage.getItem("cometProfile");
 
   useEffect(() => {
     if (!isFocused) setInputValue(url);
@@ -118,6 +121,21 @@ export function AddressBar({
           </button>
         )}
       </div>
+
+      {/* Profile button */}
+      <button
+        onClick={() => navigate("/profile")}
+        title="My Profile"
+        className={cn(
+          "flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
+          hasProfile
+            ? "bg-surface border border-[#6366f1]/50 text-[#a5b4fc] hover:border-[#6366f1]"
+            : "bg-[rgba(99,102,241,0.2)] border border-[#6366f1] text-[#a5b4fc] animate-pulse"
+        )}
+      >
+        <UserCircle className="w-3.5 h-3.5" />
+        <span>{hasProfile ? "Profile" : "Setup ✦"}</span>
+      </button>
 
       {/* Job Tracker toggle */}
       <button
