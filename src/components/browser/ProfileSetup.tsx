@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Check, ChevronRight, ChevronLeft, Upload, Plus, X, Star, Sparkles, Rocket, User, GraduationCap, Code2, Target, FileText } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, Upload, Plus, X, Sparkles, Rocket, User, GraduationCap, Code2, Target, FileText } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Project {
