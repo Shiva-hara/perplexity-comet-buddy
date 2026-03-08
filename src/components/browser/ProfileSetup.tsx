@@ -221,7 +221,6 @@ const NavButtons = ({ step, totalSteps, onBack, onNext, nextLabel }: {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function ProfileSetup({ onComplete }: { onComplete?: () => void }) {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [slideDir, setSlideDir] = useState<"left" | "right">("right");
   const [isAnimating, setIsAnimating] = useState(false);
