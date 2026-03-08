@@ -7,14 +7,14 @@ interface NewTabPageProps {
 }
 
 const quickLinks = [
-  { label: "Perplexity", url: "https://www.perplexity.ai", icon: "🔍" },
-  { label: "GitHub", url: "https://github.com", icon: "🐙" },
-  { label: "YouTube", url: "https://www.youtube.com", icon: "▶️" },
-  { label: "Wikipedia", url: "https://www.wikipedia.org", icon: "📚" },
-  { label: "Reddit", url: "https://www.reddit.com", icon: "🤖" },
-  { label: "Hacker News", url: "https://news.ycombinator.com", icon: "🟧" },
-  { label: "Stack Overflow", url: "https://stackoverflow.com", icon: "💬" },
-  { label: "MDN", url: "https://developer.mozilla.org", icon: "🦊" },
+  { label: "LinkedIn", url: "https://www.linkedin.com/jobs", icon: "💼" },
+  { label: "Naukri", url: "https://www.naukri.com", icon: "🏢" },
+  { label: "Indeed", url: "https://www.indeed.com", icon: "🔎" },
+  { label: "Internshala", url: "https://internshala.com", icon: "🎓" },
+  { label: "Glassdoor", url: "https://www.glassdoor.com", icon: "⭐" },
+  { label: "Wellfound", url: "https://wellfound.com/jobs", icon: "🚀" },
+  { label: "Monster", url: "https://www.monsterindia.com", icon: "👾" },
+  { label: "Shine", url: "https://www.shine.com", icon: "✨" },
 ];
 
 export function NewTabPage({ onNavigate }: NewTabPageProps) {
