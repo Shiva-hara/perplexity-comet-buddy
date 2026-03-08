@@ -32,11 +32,15 @@ export function usePerplexity() {
       abortRef.current = new AbortController();
 
       try {
-        const messages = history.map((m) => ({ role: m.role, content: m.content }));
+        const messages: Array<{ role: "user" | "assistant"; content: string }> = history.map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
         if (pageContext) {
+          // prepend context as first user message (no system role in this typed array)
           messages.unshift({
-            role: "system" as const,
-            content: `Current page context:\n${pageContext}\n\nAnswer questions about this page or in general.`,
+            role: "user" as const,
+            content: `[Context: ${pageContext}] Now answer: ${messages[0]?.content ?? ""}`,
           });
         }
         messages.push({ role: "user", content: query });
