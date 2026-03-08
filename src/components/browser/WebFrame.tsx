@@ -73,30 +73,35 @@ export function WebFrame({ url, onTitleChange, onLoadingChange, onNavigate }: We
       return;
     }
 
+    // Instantly handle known-blocked sites
+    if (isKnownBlocked(url)) {
+      onLoadingChange(false);
+      try {
+        const hostname = new URL(url).hostname.replace("www.", "");
+        onTitleChange(hostname);
+      } catch { onTitleChange("Blocked"); }
+      return;
+    }
+
     setBlocked(false);
     setLoadError(false);
     onLoadingChange(true);
 
-    // Detect blocked iframes via a timing heuristic
-    // If the iframe doesn't load within 8s and shows no content, it's likely blocked
     loadTimerRef.current = setTimeout(() => {
       try {
         const doc = iframeRef.current?.contentDocument;
-        // If we can't access document at all, it loaded cross-origin (may be fine)
-        // If we get an empty document, it's likely blocked
         if (doc && doc.body && doc.body.innerHTML === "") {
           setBlocked(true);
           onLoadingChange(false);
           try {
             const hostname = new URL(url).hostname.replace("www.", "");
-            onTitleChange(hostname + " (blocked)");
+            onTitleChange(hostname);
           } catch { onTitleChange("Blocked"); }
         }
       } catch {
-        // Cross-origin, likely loaded fine
         onLoadingChange(false);
       }
-    }, 5000);
+    }, 3000);
 
     return () => clearTimeout(loadTimerRef.current);
   }, [url]);
