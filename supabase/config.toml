@@ -1,1 +1,7 @@
 project_id = "bbeebusgvmudeahgwpwr"
+
+[functions.perplexity-chat]
+verify_jwt = false
+
+[functions.firecrawl-scrape]
+verify_jwt = false
