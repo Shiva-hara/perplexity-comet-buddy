@@ -78,7 +78,7 @@ export function AddressBar({
           ) : isSecure ? (
             <Lock className="w-3 h-3 text-primary/70" />
           ) : (
-            <Globe className="w-3 h-3 text-yellow-500/70" />
+            <Globe className="w-3 h-3 text-[hsl(40_80%_55%/0.7)]" />
           )}
         </div>
 
