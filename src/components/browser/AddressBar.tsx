@@ -35,6 +35,8 @@ export function AddressBar({
   const [inputValue, setInputValue] = useState(url);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const hasProfile = !!localStorage.getItem("cometProfile");
 
   useEffect(() => {
     if (!isFocused) setInputValue(url);
